@@ -1,3 +1,8 @@
 fastapi[standard]
 pydantic
+pydantic_settings
 uvicorn
+sqlalchemy
+alembic
+asyncpg
+greenlet
