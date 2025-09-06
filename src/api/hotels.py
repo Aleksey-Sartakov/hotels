@@ -1,10 +1,10 @@
 from copy import copy
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from fastapi.params import Query
 
-from schemas.common import Pagination
-from schemas.hotels import Hotel, HotelPatch
+from src.api.dependencies import PaginationDep
+from src.schemas.hotels import Hotel, HotelPatch
 
 
 hotels_router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -23,9 +23,9 @@ hotels = [
 
 @hotels_router.get("/")
 def get_hotels(
+        pagination: PaginationDep,
         id: int | None = Query(None, description="Айдишник"),
-        title: str | None = Query(None, description="Название отеля"),
-        pagination: Pagination = Depends()
+        title: str | None = Query(None, description="Название отеля")
 ):
     from_index = (pagination.page - 1) * pagination.per_page
     to_index =  pagination.page * pagination.per_page
