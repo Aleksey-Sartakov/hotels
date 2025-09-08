@@ -6,6 +6,7 @@ from sqlalchemy import insert, select
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
 from src.models.hotels import Hotels
+from src.repositories.hotels import HotelsRepository
 from src.schemas.hotels import Hotel, HotelPatch
 
 
@@ -21,22 +22,13 @@ async def get_hotels(
         title: str | None = Query(None, description="Название отеля")
 ):
     limit = pagination.per_page or HOTELS_GET_LIMIT
+    offset = (pagination.page - 1) * limit
 
     async with async_session_maker() as session:
-        query = select(Hotels)
-        if location:
-            query = query.filter(Hotels.location.icontains(location))
-        if title:
-            query = query.filter(Hotels.title.icontains(title))
-        query = (
-            query
-            .limit(limit)
-            .offset((pagination.page - 1) * limit)
-        )
-        result = await session.execute(query)
-        hotels = result.scalars().all()
+        hotels_repository = HotelsRepository(session)
+        hotels = await hotels_repository.get_all(location, title, limit, offset)
 
-    return hotels
+        return hotels
 
 
 @hotels_router.delete("/{hotel_id}")
@@ -59,12 +51,11 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
     })
 })):
     async with async_session_maker() as session:
-        add_hotel_stmt = insert(Hotels).values(**hotel_data.model_dump())
-        print(add_hotel_stmt.compile(compile_kwargs={"literal_binds": True}))
-        await session.execute(add_hotel_stmt)
+        hotels_repository = HotelsRepository(session)
+        hotel = await hotels_repository.add(**hotel_data.model_dump())
         await session.commit()
 
-    return {"status": "Created"}
+    return {"status": "Created", "data": hotel}
 
 
 @hotels_router.patch("/{hotel_id}")
