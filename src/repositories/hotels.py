@@ -2,12 +2,14 @@ from sqlalchemy import select
 
 from src.models.hotels import Hotels
 from src.repositories.base import BaseRepository
+from src.schemas.hotels import Hotel
 
 
 class HotelsRepository(BaseRepository):
     model = Hotels
+    schema = Hotel
 
-    async def get_all(self, location, title, limit, offset):
+    async def get_all(self, location, title, limit, offset) -> list[schema]:
         query = select(self.model)
         if location:
             query = query.filter(Hotels.location.icontains(location))
@@ -20,4 +22,4 @@ class HotelsRepository(BaseRepository):
         )
         result = await self.session.execute(query)
 
-        return result.scalars().all()
+        return [self.schema.model_validate(hotel) for hotel in result.scalars().all()]
