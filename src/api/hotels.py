@@ -29,6 +29,17 @@ async def get_hotels(
         return hotels
 
 
+@hotels_router.get("/{hotel_id}")
+async def get_hotel(
+        hotel_id: int
+):
+    async with async_session_maker() as session:
+        hotels_repository = HotelsRepository(session)
+        hotel = await hotels_repository.get_one_or_none(id=hotel_id)
+
+        return hotel
+
+
 @hotels_router.delete("/{hotel_id}")
 async def delete_hotels(
         hotel_id: int
@@ -62,9 +73,12 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples={
 
 @hotels_router.patch("/{hotel_id}")
 async def patch_hotel(hotel_id: int, hotel_data: HotelPatch):
+    async with async_session_maker() as session:
+        hotels_repository = HotelsRepository(session)
+        await hotels_repository.edit(hotel_data, exclude_unset=True, id=hotel_id)
+        await session.commit()
 
-
-    return {"status": "Not found"}
+    return {"status": "No content"}
 
 
 @hotels_router.put("/{hotel_id}")
