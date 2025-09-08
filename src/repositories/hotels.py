@@ -19,5 +19,5 @@ class HotelsRepository(BaseRepository):
             .offset(offset)
         )
         result = await self.session.execute(query)
-        hotels = result.scalars().all()
 
+        return result.scalars().all()
