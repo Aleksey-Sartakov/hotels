@@ -7,3 +7,5 @@ alembic
 asyncpg
 greenlet
 black
+pyjwt
+passlib[argon2]
