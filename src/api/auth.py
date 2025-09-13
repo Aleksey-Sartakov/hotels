@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, HTTPException, Response, status, Request
 from sqlalchemy.exc import IntegrityError
 
 from src.database import async_session_maker
@@ -53,4 +53,12 @@ async def login_user(user_data: UserRequestAdd, response: Response):
         response.set_cookie("access_token", access_token)
 
     return {"access_token": access_token}
+
+
+@auth_router.get("/only_auth")
+async def only_auth(request: Request):
+    access_token = request.cookies.get("access_token")
+
+    if not access_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
