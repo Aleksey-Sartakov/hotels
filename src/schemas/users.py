@@ -16,3 +16,7 @@ class UserAdd(BaseSchema):
 class User(BaseSchema):
     id: int
     email: EmailStr
+
+
+class UserWithHashedPassword(User):
+    hashed_password: str
