@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, Response, status, Request
+from fastapi import APIRouter, HTTPException, Response, status, Depends
 from sqlalchemy.exc import IntegrityError
 
+from src.api.dependencies import UserIdDep, get_access_token
 from src.database import async_session_maker
 from src.repositories.users import UsersRepository
 from src.schemas.users import UserRequestAdd, UserAdd
@@ -55,10 +56,19 @@ async def login_user(user_data: UserRequestAdd, response: Response):
     return {"access_token": access_token}
 
 
-@auth_router.get("/only_auth")
-async def only_auth(request: Request):
-    access_token = request.cookies.get("access_token")
+@auth_router.get("/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token")
 
-    if not access_token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    return {"status": "OK"}
 
+
+@auth_router.get("/me")
+async def me(user_id: UserIdDep):
+    async with async_session_maker() as session:
+        users_repository = UsersRepository(session)
+        user = await users_repository.get_one_or_none(id=user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        return user
