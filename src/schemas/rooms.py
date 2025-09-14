@@ -1,14 +1,15 @@
-from pydantic import Field
-
 from src.schemas.base import BaseSchema
 
 
-class RoomAdd(BaseSchema):
-    hotel_id: int
+class RoomAddRequest(BaseSchema):
     title: str
-    description: str | None
+    description: str | None = None
     price: int
     quantity: int
+
+
+class RoomAdd(RoomAddRequest):
+    hotel_id: int
 
 
 class Room(RoomAdd):
@@ -16,7 +17,7 @@ class Room(RoomAdd):
 
 
 class RoomPatch(BaseSchema):
-    title: str | None = Field(default=None)
-    description: str | None = Field(default=None)
-    price: str | None = Field(default=None)
-    quantity: str | None = Field(default=None)
+    title: str | None = None
+    description: str | None = None
+    price: str | None = None
+    quantity: str | None = None
