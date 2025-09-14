@@ -56,7 +56,7 @@ async def login_user(user_data: UserRequestAdd, response: Response):
     return {"access_token": access_token}
 
 
-@auth_router.get("/logout")
+@auth_router.post("/logout")
 async def logout(response: Response):
     response.delete_cookie("access_token")
 
