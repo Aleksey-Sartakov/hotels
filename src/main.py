@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from src.api.auth import auth_router
+from src.api.bookings import bookings_router
 from src.api.hotels import hotels_router
 from src.api.rooms import rooms_router
 
@@ -17,6 +18,7 @@ app = FastAPI()
 app.include_router(auth_router)
 app.include_router(hotels_router)
 app.include_router(rooms_router)
+app.include_router(bookings_router)
 
 
 if __name__ == "__main__":

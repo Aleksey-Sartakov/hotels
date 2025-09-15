@@ -10,6 +10,7 @@ from src.database import Base
 from src.models.hotels import Hotels
 from src.models.rooms import Rooms
 from src.models.users import Users
+from src.models.bookings import Bookings
 
 
 # this is the Alembic Config object, which provides
