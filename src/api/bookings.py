@@ -8,26 +8,26 @@ from src.schemas.bookings import BookingAddRequest, BookingAdd
 bookings_router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
 
-# @rooms_router.get("/{hotel_id}/rooms")
-# async def get_rooms(hotel_id: int, db: DBDep):
-#     rooms = await db.rooms.get_all(hotel_id)
-#
-#     return rooms
-#
-#
-# @rooms_router.get("/{hotel_id}/rooms/{room_id}")
-# async def get_room(hotel_id: int, room_id: int, db: DBDep):
-#     room = await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
-#
-#     return room
-#
-#
-# @rooms_router.delete("/{hotel_id}/rooms/{room_id}")
-# async def delete_rooms(hotel_id: int, room_id: int, db: DBDep):
-#     await db.rooms.delete(id=room_id, hotel_id=hotel_id)
-#     await db.commit()
-#
-#     return {"status": "No content"}
+@bookings_router.get("/")
+async def get_bookings(db: DBDep):
+    bookings = await db.bookings.get_all()
+
+    return bookings
+
+
+@bookings_router.get("/me")
+async def get_self_bookings(db: DBDep, user_id: UserIdDep):
+    bookings = await db.bookings.get_all(user_id=user_id)
+
+    return bookings
+
+
+@bookings_router.delete("/")
+async def delete_bookings(booking_id: int, db: DBDep):
+    await db.bookings.delete(id=booking_id)
+    await db.commit()
+
+    return {"status": "No content"}
 
 
 @bookings_router.post("/")
@@ -57,19 +57,3 @@ async def create_booking(db: DBDep, user_id: UserIdDep, booking_data: BookingAdd
     await db.commit()
 
     return {"status": "Created", "data": booking}
-
-
-# @rooms_router.patch("/{hotel_id}/rooms/{room_id}")
-# async def patch_room(hotel_id: int, room_id: int, room_data: RoomPatch, db: DBDep):
-#     await db.rooms.edit(room_data, exclude_unset=True, id=room_id, hotel_id=hotel_id)
-#     await db.commit()
-#
-#     return {"status": "No content"}
-#
-#
-# @rooms_router.put("/{hotel_id}/rooms/{room_id}")
-# async def put_room(hotel_id: int, room_id: int, room_data: RoomAdd, db: DBDep):
-#     await db.rooms.edit(room_data, id=room_id, hotel_id=hotel_id)
-#     await db.commit()
-#
-#     return {"status": "No content"}
