@@ -78,24 +78,10 @@ async def patch_room(hotel_id: int, room_id: int, room_data: RoomPatchRequest, d
     room_data_ = RoomPatch(**room_data_dumped)
     await db.rooms.edit(room_data_, exclude_unset=True, id=room_id, hotel_id=hotel_id)
 
-    if room_data_dumped.get("facilities_ids"):
-        if not room_data_dumped["facilities_ids"]:
-            await db.rooms_to_facilities.delete_facilities(room_id=room_id)
-        else:
-            current_room_facilities = await db.rooms_to_facilities.get_filtered(room_id=room_id)
-            current_room_facilities_ids = set([
-                room_to_facility.facility_id for room_to_facility in current_room_facilities
-            ])
-
-            facilities_to_delete = current_room_facilities_ids - set(room_data_dumped["facilities_ids"])
-            if facilities_to_delete:
-                await db.rooms_to_facilities.delete_facilities(room_id=room_id, facilities_ids=facilities_to_delete)
-
-            facilities_to_add = set(room_data_dumped["facilities_ids"]) - current_room_facilities_ids
-            if facilities_to_add:
-                await db.rooms_to_facilities.add_bulk(
-                    [RoomToFacilityAdd(room_id=room_id, facility_id=f_id) for f_id in facilities_to_add]
-                )
+    if "facilities_ids" in room_data_dumped:
+        await db.rooms_to_facilities.update_facilities_in_room(
+            room_id=room_id, facilities_ids=room_data_dumped["facilities_ids"]
+        )
 
     await db.commit()
 
@@ -112,23 +98,9 @@ async def put_room(hotel_id: int, room_id: int, room_data: RoomAddRequest, db: D
     room_data_ = RoomPatch(**room_data_dumped)
     await db.rooms.edit(room_data_, id=room_id, hotel_id=hotel_id)
 
-    if not room_data_dumped["facilities_ids"]:
-        await db.rooms_to_facilities.delete_facilities(room_id=room_id)
-    else:
-        current_room_facilities = await db.rooms_to_facilities.get_filtered(room_id=room_id)
-        current_room_facilities_ids = set([
-            room_to_facility.facility_id for room_to_facility in current_room_facilities
-        ])
-
-        facilities_to_delete = current_room_facilities_ids - set(room_data_dumped["facilities_ids"])
-        if facilities_to_delete:
-            await db.rooms_to_facilities.delete_facilities(room_id=room_id, facilities_ids=facilities_to_delete)
-
-        facilities_to_add = set(room_data_dumped["facilities_ids"]) - current_room_facilities_ids
-        if facilities_to_add:
-            await db.rooms_to_facilities.add_bulk(
-                [RoomToFacilityAdd(room_id=room_id, facility_id=f_id) for f_id in facilities_to_add]
-            )
+    await db.rooms_to_facilities.update_facilities_in_room(
+        room_id=room_id, facilities_ids=room_data_dumped["facilities_ids"]
+    )
 
     await db.commit()
 
