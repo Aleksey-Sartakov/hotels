@@ -26,8 +26,14 @@ async def get_hotels(
     limit = pagination.per_page or HOTELS_GET_LIMIT
     offset = (pagination.page - 1) * limit
 
-    # hotels = await db.hotels.get_all(location, title, limit, offset)
-    hotels = await db.hotels.get_filtered_by_period(date_from, date_to)
+    hotels = await db.hotels.get_filtered_by_period(
+        location=location,
+        title=title,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+        offset=offset
+    )
 
     return hotels
 
