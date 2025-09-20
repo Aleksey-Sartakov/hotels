@@ -9,3 +9,12 @@ class FacilityAdd(BaseSchema):
 
 class Facility(FacilityAdd):
     id: int
+
+
+class RoomToFacilityAdd(BaseSchema):
+    room_id: int
+    facility_id: int
+
+
+class RoomToFacility(RoomToFacilityAdd):
+    id: int
