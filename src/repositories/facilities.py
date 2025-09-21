@@ -4,17 +4,18 @@ from sqlalchemy import delete, select
 
 from src.models.facilities import Facilities, RoomsToFacilities
 from src.repositories.base import BaseRepository
-from src.schemas.facilities import Facility, RoomToFacility, RoomToFacilityAdd
+from src.repositories.mappers.mappers import FacilityDataMapper, RoomToFacilityDataMapper
+from src.schemas.facilities import RoomToFacilityAdd
 
 
 class FacilitiesRepository(BaseRepository):
     model = Facilities
-    schema = Facility
+    mapper = FacilityDataMapper
 
 
 class RoomsToFacilitiesRepository(BaseRepository):
     model = RoomsToFacilities
-    schema = RoomToFacility
+    mapper = RoomToFacilityDataMapper
 
     async def update_facilities_in_room(self, room_id: int, facilities_ids: list[int] | None = None):
         if not facilities_ids:

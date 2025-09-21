@@ -7,6 +7,7 @@ from src.api.dependencies import DBDep
 from src.schemas.facilities import RoomToFacilityAdd
 from src.schemas.rooms import RoomAdd, RoomPatch, RoomAddRequest, RoomPatchRequest
 
+
 rooms_router = APIRouter(prefix="/hotels", tags=["Номера"])
 
 
@@ -24,7 +25,7 @@ async def get_rooms(
 
 @rooms_router.get("/{hotel_id}/rooms/{room_id}")
 async def get_room(hotel_id: int, room_id: int, db: DBDep):
-    room = await db.rooms.get_one_or_none(id=room_id, hotel_id=hotel_id)
+    room = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
 
     return room
 
