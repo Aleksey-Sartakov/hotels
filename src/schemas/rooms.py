@@ -1,4 +1,5 @@
 from src.schemas.base import BaseSchema
+from src.schemas.facilities import Facility
 
 
 class RoomAddRequest(BaseSchema):
@@ -19,6 +20,10 @@ class RoomAdd(BaseSchema):
 
 class Room(RoomAdd):
     id: int
+
+
+class RoomWithRels(Room):
+    facilities: list[Facility]
 
 
 class RoomPatch(BaseSchema):
