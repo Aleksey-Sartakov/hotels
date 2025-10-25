@@ -1,7 +1,10 @@
+import json
+
 from fastapi import APIRouter, Body
 from fastapi.openapi.models import Example
+from fastapi_cache.decorator import cache
 
-from src.api.dependencies import DBDep
+from src.api.dependencies import DBDep, RedisDep
 from src.schemas.facilities import FacilityAdd
 
 
@@ -9,10 +12,15 @@ facilities_router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
 
 @facilities_router.get("/")
-async def get_facilities(db: DBDep):
-    facilities = await db.facilities.get_all()
+async def get_facilities(db: DBDep, redis: RedisDep):
+    cached_facilities = await redis.get("facilities")
+    if not cached_facilities:
+        facilities = await db.facilities.get_all()
+        await redis.set("facilities", json.dumps([f.model_dump() for f in facilities]))
 
-    return facilities
+        return facilities
+
+    return json.loads(cached_facilities)
 
 
 @facilities_router.delete("/")

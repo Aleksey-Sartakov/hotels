@@ -9,3 +9,5 @@ greenlet
 black
 pyjwt
 passlib[argon2]
+redis
+fastapi-cache2

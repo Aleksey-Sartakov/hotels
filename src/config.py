@@ -7,7 +7,11 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     DB_NAME: str
+
     JWT_SECRET_KEY: str
+
+    REDIS_HOST: str
+    REDIS_PORT: int
 
     @property
     def DB_URL(self):

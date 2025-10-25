@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, Request, HTTPException, status
 from pydantic import BaseModel, Field
+from redis.asyncio import Redis
 
 from src.database import async_session_maker
 from src.services.auth import AuthService
@@ -35,6 +36,11 @@ async def get_db():
         yield db
 
 
+def get_redis(request: Request) -> Redis:
+    return request.app.state.redis
+
+
 DBDep = Annotated[DBManager, Depends(get_db)]
 PaginationDep = Annotated[Pagination, Depends()]
 UserIdDep = Annotated[int, Depends(get_current_user_id)]
+RedisDep = Annotated[Redis, Depends(get_redis)]

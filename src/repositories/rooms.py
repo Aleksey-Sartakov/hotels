@@ -21,6 +21,7 @@ class RoomsRepository(BaseRepository):
             .options(joinedload(self.model.facilities))
             .filter(Rooms.hotel_id == hotel_id, Rooms.id.in_(available_rooms_ids))
         )
+        print(query.compile(compile_kwargs={"literal_binds": True}))
         result = await self.session.execute(query)
 
         return [RoomWithRelsDataMapper.map_to_domain_entity(entity) for entity in result.unique().scalars().all()]
