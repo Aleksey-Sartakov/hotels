@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import APIRouter, Body, Query, HTTPException, status
 from fastapi.openapi.models import Example
+from fastapi_cache.decorator import cache
 
 from src.api.dependencies import DBDep
 from src.schemas.facilities import RoomToFacilityAdd
@@ -12,6 +13,7 @@ rooms_router = APIRouter(prefix="/hotels", tags=["Номера"])
 
 
 @rooms_router.get("/{hotel_id}/rooms")
+@cache(expire=10)
 async def get_rooms(
         hotel_id: int,
         db: DBDep,

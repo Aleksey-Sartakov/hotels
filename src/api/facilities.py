@@ -12,15 +12,11 @@ facilities_router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
 
 @facilities_router.get("/")
+@cache(expire=10)
 async def get_facilities(db: DBDep, redis: RedisDep):
-    cached_facilities = await redis.get("facilities")
-    if not cached_facilities:
-        facilities = await db.facilities.get_all()
-        await redis.set("facilities", json.dumps([f.model_dump() for f in facilities]))
+    facilities = await db.facilities.get_all()
 
-        return facilities
-
-    return json.loads(cached_facilities)
+    return facilities
 
 
 @facilities_router.delete("/")
