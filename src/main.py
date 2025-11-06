@@ -14,6 +14,7 @@ from src.api.auth import auth_router
 from src.api.bookings import bookings_router
 from src.api.facilities import facilities_router
 from src.api.hotels import hotels_router
+from src.api.images import images_router
 from src.api.rooms import rooms_router
 from src.config import settings
 from src.connectors.redis_conn import init_redis
@@ -40,6 +41,7 @@ app.include_router(hotels_router)
 app.include_router(rooms_router)
 app.include_router(bookings_router)
 app.include_router(facilities_router)
+app.include_router(images_router)
 
 
 if __name__ == "__main__":
