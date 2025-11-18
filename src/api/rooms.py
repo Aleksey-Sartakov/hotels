@@ -62,8 +62,8 @@ async def create_room(hotel_id: int, db: DBDep, room_data: RoomAddRequest = Body
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
     room = await db.rooms.add(_room_data)
 
-    facilities = [RoomToFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
-    if facilities:
+    if room_data.facilities_ids:
+        facilities = [RoomToFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
         await db.rooms_to_facilities.add_bulk(facilities)
 
     await db.commit()
