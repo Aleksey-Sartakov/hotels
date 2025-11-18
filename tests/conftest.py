@@ -21,16 +21,16 @@ async def setup_database():
 @pytest.fixture(scope="session", autouse=True)
 async def insert_data_in_db(setup_database):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        with open("tests/mock_hotels.json", "r") as hotels_f:
-            hotels_data = json.loads(hotels_f.read())
+        with open("tests/mock_hotels.json", "r", encoding="utf-8") as hotels_f:
+            hotels_data = json.load(hotels_f)
             for hotel in hotels_data:
                 response = await ac.post(
                     "/hotels",
                     json=hotel
                 )
 
-        with open("tests/mock_rooms.json", "r") as rooms_f:
-            rooms_data = json.loads(rooms_f.read())
+        with open("tests/mock_rooms.json", "r", encoding="utf-8") as rooms_f:
+            rooms_data = json.load(rooms_f)
             for room in rooms_data:
                 await ac.post(
                     f"/hotels/{room['hotel_id']}/rooms",
