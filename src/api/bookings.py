@@ -8,7 +8,7 @@ from src.schemas.bookings import BookingAddRequest, BookingAdd
 bookings_router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
 
-@bookings_router.get("/")
+@bookings_router.get("")
 async def get_bookings(db: DBDep):
     bookings = await db.bookings.get_all()
 
@@ -22,7 +22,7 @@ async def get_self_bookings(db: DBDep, user_id: UserIdDep):
     return bookings
 
 
-@bookings_router.delete("/")
+@bookings_router.delete("")
 async def delete_bookings(booking_id: int, db: DBDep):
     await db.bookings.delete(id=booking_id)
     await db.commit()
@@ -30,7 +30,7 @@ async def delete_bookings(booking_id: int, db: DBDep):
     return {"status": "No content"}
 
 
-@bookings_router.post("/")
+@bookings_router.post("")
 async def create_booking(db: DBDep, user_id: UserIdDep, booking_data: BookingAddRequest = Body(openapi_examples={
     "1": Example(summary="Бронирование 1", value={
         "date_from": "2026-01-01",

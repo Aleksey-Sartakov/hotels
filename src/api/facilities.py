@@ -11,7 +11,7 @@ from src.schemas.facilities import FacilityAdd
 facilities_router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
 
-@facilities_router.get("/")
+@facilities_router.get("")
 @cache(expire=10)
 async def get_facilities(db: DBDep, redis: RedisDep):
     facilities = await db.facilities.get_all()
@@ -19,7 +19,7 @@ async def get_facilities(db: DBDep, redis: RedisDep):
     return facilities
 
 
-@facilities_router.delete("/")
+@facilities_router.delete("")
 async def delete_facilities(facility_id: int, db: DBDep):
     await db.facilities.delete(id=facility_id)
     await db.commit()
@@ -27,7 +27,7 @@ async def delete_facilities(facility_id: int, db: DBDep):
     return {"status": "No content"}
 
 
-@facilities_router.post("/")
+@facilities_router.post("")
 async def create_facilities(db: DBDep, facility_add: FacilityAdd = Body(openapi_examples={
     "1": Example(summary="Кондиционер", value={
         "title": "Кондиционер"

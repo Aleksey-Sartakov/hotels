@@ -8,7 +8,6 @@ from pathlib import Path
 
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from starlette.routing import Mount
 
 from src.api.auth import auth_router
 from src.api.bookings import bookings_router

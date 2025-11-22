@@ -12,7 +12,7 @@ class RedisManager():
 
     async def close(self):
         if self.redis:
-            await self.redis.close()
+            await self.redis.aclose()
 
     async def get(self, key: str):
         return await self.redis.get(key)

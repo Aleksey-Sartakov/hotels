@@ -15,7 +15,7 @@ HOTELS_GET_LIMIT = 5
 hotels_router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 
-@hotels_router.get("/")
+@hotels_router.get("")
 @cache(expire=10)
 async def get_hotels(
         pagination: PaginationDep,
