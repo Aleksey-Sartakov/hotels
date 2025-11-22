@@ -17,3 +17,10 @@ class BookingAdd(BookingAddRequest):
 class Booking(BookingAdd):
     id: int
     total_cost: int
+
+
+class BookingUpdate(BaseSchema):
+    date_from: date | None = None
+    date_to: date | None = None
+    room_id: int | None = None
+    price: int | None = None
