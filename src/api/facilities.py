@@ -28,17 +28,20 @@ async def delete_facilities(facility_id: int, db: DBDep):
 
 
 @facilities_router.post("")
-async def create_facilities(db: DBDep, facility_add: FacilityAdd = Body(openapi_examples={
-    "1": Example(summary="Кондиционер", value={
-        "title": "Кондиционер"
-    }),
-    "2": Example(summary="Душ", value={
-        "title": "Душ"
-    }),
-    "3": Example(summary="Телевизор", value={
-        "title": "Телевизор"
-    }),
-})):
+async def create_facilities(
+        db: DBDep,
+        facility_add: FacilityAdd = Body(openapi_examples={
+            "1": Example(summary="Кондиционер", value={
+                "title": "Кондиционер"
+            }),
+            "2": Example(summary="Душ", value={
+                "title": "Душ"
+            }),
+            "3": Example(summary="Телевизор", value={
+                "title": "Телевизор"
+            }),
+        })
+):
     facility = await db.facilities.add(facility_add)
     await db.commit()
 
