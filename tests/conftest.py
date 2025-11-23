@@ -3,6 +3,8 @@ from typing import AsyncGenerator
 from unittest import mock
 from unittest.mock import AsyncMock
 
+from sqlalchemy import True_
+
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 import pytest
@@ -69,3 +71,12 @@ async def insert_data_in_db(setup_database, ac):
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(insert_data_in_db, ac):
     await ac.post("/auth/register", json={"email": "test@user.com", "password": "1234"})
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def authenticated_ac(register_user):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.post("/auth/login", json={"email": "test@user.com", "password": "1234"})
+        assert response.status_code == 200
+
+        yield ac
