@@ -47,7 +47,7 @@ async def setup_database():
         await conn.run_sync(Base.metadata.create_all)
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 async def ac() -> AsyncGenerator[AsyncClient, None]:
     # Явно вызываем срабатывание lifespan, без этого он не отработает по умолчанию
     async with app.router.lifespan_context(app):
@@ -73,10 +73,10 @@ async def register_user(insert_data_in_db, ac):
     await ac.post("/auth/register", json={"email": "test@user.com", "password": "1234"})
 
 
-@pytest.fixture(scope="session", autouse=True)
-async def authenticated_ac(register_user):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.post("/auth/login", json={"email": "test@user.com", "password": "1234"})
-        assert response.status_code == 200
+@pytest.fixture(scope="session")
+async def authenticated_ac(register_user, ac):
+    response = await ac.post("/auth/login", json={"email": "test@user.com", "password": "1234"})
+    assert response.status_code == 200
+    assert ac.cookies["access_token"]
 
-        yield ac
+    yield ac

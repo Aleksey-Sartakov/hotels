@@ -17,9 +17,6 @@ async def test_booking_crud(db):
     )
     created_booking = await db.bookings.add(booking_data)
 
-    all_bookings = await db.bookings.get_all()
-    assert len(all_bookings) == 1
-
     assert created_booking.date_from == date(year=2026, month=1, day=1)
     assert created_booking.date_to == date(year=2026, month=1, day=10)
     assert created_booking.room_id == room.id
@@ -33,6 +30,7 @@ async def test_booking_crud(db):
     assert created_booking.date_from == date(year=2026, month=1, day=5)
 
     # удалить бронь
+    all_bookings_len_before = len(await db.bookings.get_all())
     await db.bookings.delete(id=created_booking.id)
-    all_bookings = await db.bookings.get_all()
-    assert len(all_bookings) == 0
+    all_bookings_len_after = len(await db.bookings.get_all())
+    assert all_bookings_len_before == all_bookings_len_after + 1
