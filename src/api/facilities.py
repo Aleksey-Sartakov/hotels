@@ -1,5 +1,3 @@
-import json
-
 from fastapi import APIRouter, Body
 from fastapi.openapi.models import Example
 from fastapi_cache.decorator import cache

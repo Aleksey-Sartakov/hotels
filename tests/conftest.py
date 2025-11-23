@@ -1,10 +1,15 @@
 import json
 from typing import AsyncGenerator
+from unittest import mock
+from unittest.mock import AsyncMock
+
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 import pytest
+from fastapi import Request
 from httpx import AsyncClient, ASGITransport
 
-from src.api.dependencies import get_db
+from src.api.dependencies import get_db, get_redis
 from src.config import settings
 from src.database import Base, engine_null_pool, async_session_maker_null_pool
 from src.main import app
@@ -12,12 +17,17 @@ from src.models import *
 from src.utils.db_manager import DBManager
 
 
+# Функция для переопределения зависимости к БД, чтобы создавалось соединение без пула - нужно т.к. каждый тест вызывается в отдельном процессе
 async def get_db_null_pool() -> AsyncGenerator[DBManager, None]:
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
         yield db
 
+# Функция для переопределения зависимости с redis - по умолчанию при тестах не срабатывает lifespan, поэтому нам неоткуда достать объект редис
+async def fake_get_redis(request: Request):
+    return AsyncMock()
 
 app.dependency_overrides[get_db] = get_db_null_pool
+app.dependency_overrides[get_redis] = fake_get_redis
 
 
 @pytest.fixture()
@@ -37,6 +47,7 @@ async def setup_database():
 
 @pytest.fixture(scope="session", autouse=True)
 async def ac() -> AsyncGenerator[AsyncClient, None]:
+    # Явно вызываем срабатывание lifespan, без этого он не отработает по умолчанию
     async with app.router.lifespan_context(app):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
             yield ac
