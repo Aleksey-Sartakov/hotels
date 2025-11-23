@@ -1,6 +1,12 @@
 import pytest
 
 
+@pytest.fixture()
+async def delete_all_bookings(db):
+    await db.bookings.delete()
+    await db.commit()
+
+
 async def test_get_bookings_me(authenticated_ac):
     response = await authenticated_ac.get("/bookings/me")
     assert response.status_code == 200
@@ -32,3 +38,25 @@ async def test_add_booking(
     if response.status_code == 200:
         assert isinstance(data, dict)
         assert "data" in data
+
+
+@pytest.mark.parametrize("room_id, date_from, date_to, bookings_count", [
+    (1, "2026-02-02", "2026-02-07", 1),
+    (1, "2026-02-03", "2026-02-08", 2),
+    (1, "2026-02-04", "2026-02-09", 3)
+])
+async def test_add_and_get_my_bookings(
+        room_id, date_from, date_to, bookings_count, db, authenticated_ac, delete_all_bookings
+):
+    response = await authenticated_ac.post(
+        "/bookings",
+        json={
+            "room_id": room_id,
+            "date_from": date_from,
+            "date_to": date_to
+        }
+    )
+    assert response.status_code == 200
+    my_bookings = (await authenticated_ac.get("/bookings/me")).json()
+
+    assert len(my_bookings) == bookings_count
