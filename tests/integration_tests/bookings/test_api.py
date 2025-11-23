@@ -1,10 +1,13 @@
 import pytest
 
+from tests.conftest import get_db_null_pool
 
-@pytest.fixture()
-async def delete_all_bookings(db):
-    await db.bookings.delete()
-    await db.commit()
+
+@pytest.fixture(scope="module")
+async def delete_all_bookings():
+    async for db_ in get_db_null_pool():
+        await db_.bookings.delete()
+        await db_.commit()
 
 
 async def test_get_bookings_me(authenticated_ac):

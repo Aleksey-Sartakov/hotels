@@ -75,6 +75,7 @@ async def register_user(insert_data_in_db, ac):
 
 @pytest.fixture(scope="session")
 async def authenticated_ac(register_user, ac):
+    print("-----------++++++++++++-----++++++++++++++++++++--------")
     response = await ac.post("/auth/login", json={"email": "test@user.com", "password": "1234"})
     assert response.status_code == 200
     assert ac.cookies["access_token"]
