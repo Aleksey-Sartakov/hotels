@@ -1,5 +1,6 @@
 from datetime import date
 
+from fastapi import HTTPException
 from sqlalchemy import select
 
 from src.models.bookings import Bookings
@@ -25,8 +26,8 @@ class BookingsRepository(BaseRepository):
     async def add_booking(self, data: BookingAdd):
         available_rooms_ids_query = get_available_rooms_ids_query(data.date_from, data.date_to)
         available_rooms_ids = await self.session.execute(available_rooms_ids_query)
-        if not data.room_id in available_rooms_ids:
-            raise Exception
+        if not data.room_id in available_rooms_ids.scalars():
+            raise HTTPException(500)
 
         booking = await self.add(data)
 
