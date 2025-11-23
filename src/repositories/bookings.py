@@ -5,6 +5,8 @@ from sqlalchemy import select
 from src.models.bookings import Bookings
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import BookingDataMapper
+from src.repositories.utils import get_available_rooms_ids_query
+from src.schemas.bookings import BookingAdd
 
 
 class BookingsRepository(BaseRepository):
@@ -19,3 +21,13 @@ class BookingsRepository(BaseRepository):
         res = await self.session.execute(query)
 
         return [self.mapper.map_to_domain_entity(booking) for booking in res.scalars()]
+
+    async def add_booking(self, data: BookingAdd):
+        available_rooms_ids_query = get_available_rooms_ids_query(data.date_from, data.date_to)
+        available_rooms_ids = await self.session.execute(available_rooms_ids_query)
+        if not data.room_id in available_rooms_ids:
+            raise Exception
+
+        booking = await self.add(data)
+
+        return booking

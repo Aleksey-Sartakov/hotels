@@ -53,7 +53,7 @@ async def create_booking(db: DBDep, user_id: UserIdDep, booking_data: BookingAdd
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Выбранная комната не существует!")
 
     _booking_data = BookingAdd(user_id=user_id, price=room.price, **booking_data.model_dump(exclude_unset=True))
-    booking = await db.bookings.add(_booking_data)
+    booking = await db.bookings.add_booking(_booking_data)
     await db.commit()
 
     return {"status": "Created", "data": booking}
