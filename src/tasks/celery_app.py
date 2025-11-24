@@ -3,7 +3,7 @@ from celery import Celery
 from src.config import settings
 
 
-def init_celery(celery_name, broker_host: str, broker_port: int, tasks_path: str, broker_type: str = None):
+def init_celery(celery_name, broker_host: str, broker_port: int, tasks_path: str, broker_type: str | None = None):
     broker = f"redis://{broker_host}:{broker_port}"
 
     if broker_type and broker_type == "rabbitmq":

@@ -20,7 +20,7 @@ class RedisManager:
     async def delete(self, key: str):
         await self.redis.delete(key)
 
-    async def set(self, key: str, value: str, expire: int = None):
+    async def set(self, key: str, value: str, expire: int | None = None):
         if expire:
             await self.redis.set(key, value, ex=expire)
         else:

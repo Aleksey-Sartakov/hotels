@@ -14,7 +14,13 @@ class HotelsRepository(BaseRepository):
     mapper = HotelDataMapper
 
     async def get_filtered_by_period(
-        self, location: str, title: str, limit: int, offset: int, date_from: date, date_to: date
+        self,
+        limit: int,
+        offset: int,
+        date_from: date,
+        date_to: date,
+        title: str | None = None,
+        location: str | None = None,
     ):
         available_rooms_ids = get_available_rooms_ids_query(date_from, date_to)
         available_hotels_ids = select(Rooms.hotel_id).filter(Rooms.id.in_(available_rooms_ids))

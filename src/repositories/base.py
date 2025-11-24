@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 from sqlalchemy import select, update, delete, insert
 
+from src.database import Base
 from src.repositories.mappers.base import DataMapper
 
 
 class BaseRepository:
-    model = None
-    mapper: DataMapper = None
+    model: type[Base]
+    mapper: DataMapper
 
     def __init__(self, session):
         self.session = session

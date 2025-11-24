@@ -3,8 +3,8 @@ from src.schemas.base import BaseSchema
 
 
 class DataMapper:
-    db_model: type[Base] = None
-    schema: type[BaseSchema] = None
+    db_model: type[Base] | None = None
+    schema: type[BaseSchema] | None = None
 
     @classmethod
     def map_to_domain_entity(cls, data: Base) -> BaseSchema:
