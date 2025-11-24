@@ -34,14 +34,14 @@ async def login_user(user_data: UserRequestAdd, db: DBDep, response: Response):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid username or password!"
+            detail="Invalid username or password!"
         )
 
     pwd_is_valid = auth_service.verify_password(user_data.password, user.hashed_password)
     if not pwd_is_valid:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid username or password!"
+            detail="Invalid username or password!"
         )
 
     access_token = auth_service.create_access_token({"user_id": user.id})

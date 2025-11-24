@@ -42,12 +42,14 @@ pathspec==0.12.1
 pendulum==3.1.0
 pillow==12.0.0
 platformdirs==4.4.0
+playwright==1.56.0
 pluggy==1.6.0
 prompt_toolkit==3.0.52
 pycparser==2.23
 pydantic==2.11.7
 pydantic-settings==2.10.1
 pydantic_core==2.33.2
+pyee==13.0.0
 Pygments==2.19.2
 PyJWT==2.10.1
 pytest==9.0.1
@@ -61,6 +63,7 @@ redis==7.0.0
 rich==14.1.0
 rich-toolkit==0.15.0
 rignore==0.6.4
+ruff==0.14.6
 sentry-sdk==2.35.2
 shellingham==1.5.4
 six==1.17.0

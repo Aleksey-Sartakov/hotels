@@ -26,7 +26,7 @@ class BookingsRepository(BaseRepository):
     async def add_booking(self, data: BookingAdd):
         available_rooms_ids_query = get_available_rooms_ids_query(data.date_from, data.date_to)
         available_rooms_ids = await self.session.execute(available_rooms_ids_query)
-        if not data.room_id in available_rooms_ids.scalars():
+        if data.room_id not in available_rooms_ids.scalars():
             raise HTTPException(500)
 
         booking = await self.add(data)
