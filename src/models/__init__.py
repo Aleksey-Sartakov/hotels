@@ -5,7 +5,7 @@ from src.models.bookings import Bookings
 from src.models.facilities import Facilities
 
 
-__all__ =[
+__all__ = [
     "Hotels",
     "Rooms",
     "Users",

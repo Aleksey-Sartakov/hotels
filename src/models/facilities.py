@@ -19,7 +19,6 @@ class Facilities(Base):
     rooms: Mapped[list["Rooms"]] = relationship(back_populates="facilities", secondary="rooms_to_facilities")
 
 
-
 class RoomsToFacilities(Base):
     __tablename__ = "rooms_to_facilities"
 

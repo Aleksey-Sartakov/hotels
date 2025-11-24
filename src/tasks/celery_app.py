@@ -16,12 +16,7 @@ celery_instance = init_celery(
     celery_name="hotels_background_task_manager",
     broker_host=settings.REDIS_HOST,
     broker_port=settings.REDIS_PORT,
-    tasks_path="src.tasks.tasks"
+    tasks_path="src.tasks.tasks",
 )
 
-celery_instance.conf.beat_schedule = {
-    "luboe_nazvanie": {
-        "task": "booking_today_checkin",
-        "schedule": 5
-    }
-}
+celery_instance.conf.beat_schedule = {"luboe_nazvanie": {"task": "booking_today_checkin", "schedule": 5}}

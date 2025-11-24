@@ -14,30 +14,17 @@ class HotelsRepository(BaseRepository):
     mapper = HotelDataMapper
 
     async def get_filtered_by_period(
-            self,
-            location: str,
-            title: str,
-            limit: int,
-            offset: int,
-            date_from: date,
-            date_to: date
+        self, location: str, title: str, limit: int, offset: int, date_from: date, date_to: date
     ):
         available_rooms_ids = get_available_rooms_ids_query(date_from, date_to)
-        available_hotels_ids = (
-            select(Rooms.hotel_id)
-            .filter(Rooms.id.in_(available_rooms_ids))
-        )
+        available_hotels_ids = select(Rooms.hotel_id).filter(Rooms.id.in_(available_rooms_ids))
 
         query = select(self.model).filter(Hotels.id.in_(available_hotels_ids))
         if location:
             query = query.filter(Hotels.location.icontains(location))
         if title:
             query = query.filter(Hotels.title.icontains(title))
-        query = (
-            query
-            .limit(limit)
-            .offset(offset)
-        )
+        query = query.limit(limit).offset(offset)
         result = await self.session.execute(query)
 
         return [self.mapper.map_to_domain_entity(hotel) for hotel in result.scalars().all()]

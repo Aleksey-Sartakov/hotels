@@ -13,7 +13,7 @@ async def test_booking_crud(db):
         date_to=date(year=2026, month=1, day=10),
         room_id=room.id,
         user_id=user.id,
-        price=100
+        price=100,
     )
     created_booking = await db.bookings.add(booking_data)
 

@@ -21,10 +21,7 @@ class RoomsToFacilitiesRepository(BaseRepository):
         if not facilities_ids:
             await self.delete_facilities_from_room(room_id=room_id)
         else:
-            current_facilities_ids_query = (
-                select(RoomsToFacilities.facility_id)
-                .filter_by(room_id=room_id)
-            )
+            current_facilities_ids_query = select(RoomsToFacilities.facility_id).filter_by(room_id=room_id)
             current_facilities_ids = await self.session.execute(current_facilities_ids_query)
             current_facilities_ids = set(current_facilities_ids.scalars().all())
 

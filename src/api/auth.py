@@ -19,8 +19,7 @@ async def register_user(user_data: UserRequestAdd, db: DBDep):
         await db.commit()
     except IntegrityError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"User with email {user_data.email} already exists!"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=f"User with email {user_data.email} already exists!"
         )
 
     return {"status": "Created"}
@@ -32,17 +31,11 @@ async def login_user(user_data: UserRequestAdd, db: DBDep, response: Response):
 
     user = await db.users.get_user_with_hashed_password(email=user_data.email)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password!"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password!")
 
     pwd_is_valid = auth_service.verify_password(user_data.password, user.hashed_password)
     if not pwd_is_valid:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password!"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password!")
 
     access_token = auth_service.create_access_token({"user_id": user.id})
     response.set_cookie("access_token", access_token)

@@ -15,10 +15,7 @@ rooms_router = APIRouter(prefix="/hotels", tags=["Номера"])
 @rooms_router.get("/{hotel_id}/rooms")
 @cache(expire=10)
 async def get_rooms(
-        hotel_id: int,
-        db: DBDep,
-        date_from: date = Query(example="2026-01-01"),
-        date_to: date = Query(example="2026-01-20")
+    hotel_id: int, db: DBDep, date_from: date = Query(example="2026-01-01"), date_to: date = Query(example="2026-01-20")
 ):
     rooms = await db.rooms.get_filtered_by_period(hotel_id, date_from, date_to)
 
@@ -41,24 +38,36 @@ async def delete_rooms(hotel_id: int, room_id: int, db: DBDep):
 
 
 @rooms_router.post("/{hotel_id}/rooms")
-async def create_room(hotel_id: int, db: DBDep, room_data: RoomAddRequest = Body(openapi_examples={
-    "1": Example(summary="Люкс, отель 1", value={
-        "hotel_id": 1,
-        "title": "Люкс",
-        "description": "Супер пупер номер",
-        "price": 12000,
-        "quantity": 2,
-        "facilities_ids": []
-    }),
-    "2": Example(summary="Средний, отель 1", value={
-        "hotel_id": 1,
-        "title": "Средний",
-        "description": "Ничего необычного",
-        "price": 6000,
-        "quantity": 33,
-        "facilities_ids": []
-    }),
-})):
+async def create_room(
+    hotel_id: int,
+    db: DBDep,
+    room_data: RoomAddRequest = Body(
+        openapi_examples={
+            "1": Example(
+                summary="Люкс, отель 1",
+                value={
+                    "hotel_id": 1,
+                    "title": "Люкс",
+                    "description": "Супер пупер номер",
+                    "price": 12000,
+                    "quantity": 2,
+                    "facilities_ids": [],
+                },
+            ),
+            "2": Example(
+                summary="Средний, отель 1",
+                value={
+                    "hotel_id": 1,
+                    "title": "Средний",
+                    "description": "Ничего необычного",
+                    "price": 6000,
+                    "quantity": 33,
+                    "facilities_ids": [],
+                },
+            ),
+        }
+    ),
+):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
     room = await db.rooms.add(_room_data)
 

@@ -14,7 +14,7 @@ from src.api.dependencies import get_db, get_redis
 from src.config import settings
 from src.database import Base, engine_null_pool, async_session_maker_null_pool
 from src.main import app
-from src.models import * # noqa
+from src.models import *  # noqa
 from src.utils.db_manager import DBManager
 
 
@@ -23,9 +23,11 @@ async def get_db_null_pool() -> AsyncGenerator[DBManager, None]:
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
         yield db
 
+
 # Функция для переопределения зависимости с redis - по умолчанию при тестах не срабатывает lifespan, поэтому нам неоткуда достать объект редис
 async def fake_get_redis(request: Request):
     return AsyncMock()
+
 
 app.dependency_overrides[get_db] = get_db_null_pool
 app.dependency_overrides[get_redis] = fake_get_redis

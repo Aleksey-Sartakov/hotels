@@ -19,7 +19,7 @@ def get_access_token(request: Request) -> str:
     if not access_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Для выполнения данного действия необходимо авторизоваться!"
+            detail="Для выполнения данного действия необходимо авторизоваться!",
         )
 
     return access_token
