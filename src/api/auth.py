@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response, status
-from sqlalchemy.exc import IntegrityError
 
 from src.api.dependencies import UserIdDep, DBDep
+from src.exceptions import DBRestrictionsViolatedException
 from src.schemas.users import UserRequestAdd, UserAdd
 from src.services.auth import AuthService
 
@@ -17,7 +17,7 @@ async def register_user(user_data: UserRequestAdd, db: DBDep):
     try:
         await db.users.add(new_user_data)
         await db.commit()
-    except IntegrityError:
+    except DBRestrictionsViolatedException:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=f"User with email {user_data.email} already exists!"
         )

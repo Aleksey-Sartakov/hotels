@@ -2,6 +2,7 @@ from fastapi import APIRouter, Body, HTTPException, status
 from fastapi.openapi.models import Example
 
 from src.api.dependencies import DBDep, UserIdDep
+from src.exceptions import ObjectNotFoundException, AllRoomsAreBookedException
 from src.schemas.bookings import BookingAddRequest, BookingAdd
 
 
@@ -49,12 +50,17 @@ async def create_booking(
         }
     ),
 ):
-    room = await db.rooms.get_one_or_none(id=booking_data.room_id)
-    if not room:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Выбранная комната не существует!")
+    try:
+        room = await db.rooms.get_one_or_none(id=booking_data.room_id)
+    except ObjectNotFoundException:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Номер не найден!")
 
     _booking_data = BookingAdd(user_id=user_id, price=room.price, **booking_data.model_dump(exclude_unset=True))
-    booking = await db.bookings.add_booking(_booking_data)
+    try:
+        booking = await db.bookings.add_booking(_booking_data)
+    except AllRoomsAreBookedException:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Не осталось свободных номеров.")
+
     await db.commit()
 
     return {"status": "Created", "data": booking}

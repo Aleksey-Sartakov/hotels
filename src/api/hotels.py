@@ -1,11 +1,13 @@
 from datetime import date
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, HTTPException
 from fastapi.openapi.models import Example
 from fastapi.params import Query
 from fastapi_cache.decorator import cache
+from starlette import status
 
 from src.api.dependencies import PaginationDep, DBDep
+from src.exceptions import DateToIsLessOrEqualThenDateFromException, ObjectNotFoundException
 from src.schemas.hotels import HotelPatch, HotelAdd
 
 
@@ -28,16 +30,25 @@ async def get_hotels(
     limit = pagination.per_page or HOTELS_GET_LIMIT
     offset = (pagination.page - 1) * limit
 
-    hotels = await db.hotels.get_filtered_by_period(
-        location=location, title=title, date_from=date_from, date_to=date_to, limit=limit, offset=offset
-    )
+    try:
+        hotels = await db.hotels.get_filtered_by_period(
+            location=location, title=title, date_from=date_from, date_to=date_to, limit=limit, offset=offset
+        )
+    except DateToIsLessOrEqualThenDateFromException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Дата выезда должна быть указаны позднее даты заезда"
+        )
 
     return hotels
 
 
 @hotels_router.get("/{hotel_id}")
 async def get_hotel(hotel_id: int, db: DBDep):
-    hotel = await db.hotels.get_one_or_none(id=hotel_id)
+    try:
+        hotel = await db.hotels.get_one(id=hotel_id)
+    except ObjectNotFoundException:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Отель не найден")
 
     return hotel
 

@@ -2,6 +2,7 @@ from datetime import date
 
 from sqlalchemy import select
 
+from src.exceptions import DateToIsLessOrEqualThenDateFromException
 from src.models.hotels import Hotels
 from src.models.rooms import Rooms
 from src.repositories.base import BaseRepository
@@ -22,6 +23,9 @@ class HotelsRepository(BaseRepository):
         title: str | None = None,
         location: str | None = None,
     ):
+        if date_from >= date_to:
+            raise DateToIsLessOrEqualThenDateFromException()
+
         available_rooms_ids = get_available_rooms_ids_query(date_from, date_to)
         available_hotels_ids = select(Rooms.hotel_id).filter(Rooms.id.in_(available_rooms_ids))
 

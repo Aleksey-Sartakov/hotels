@@ -3,6 +3,7 @@ from datetime import date
 from fastapi import HTTPException
 from sqlalchemy import select
 
+from src.exceptions import AllRoomsAreBookedException
 from src.models.bookings import Bookings
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import BookingDataMapper
@@ -24,7 +25,7 @@ class BookingsRepository(BaseRepository):
         available_rooms_ids_query = get_available_rooms_ids_query(data.date_from, data.date_to)
         available_rooms_ids = await self.session.execute(available_rooms_ids_query)
         if data.room_id not in available_rooms_ids.scalars():
-            raise HTTPException(500)
+            raise AllRoomsAreBookedException()
 
         booking = await self.add(data)
 
