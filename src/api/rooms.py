@@ -5,7 +5,8 @@ from fastapi.openapi.models import Example
 from fastapi_cache.decorator import cache
 
 from src.api.dependencies import DBDep
-from src.exceptions import DateToIsLessOrEqualThenDateFromException, ObjectNotFoundException
+from src.exceptions import DateToIsLessOrEqualThenDateFromException, ObjectNotFoundException, \
+    HotelNotFoundHTTPException, RoomNotFoundHTTPException
 from src.schemas.facilities import RoomToFacilityAdd
 from src.schemas.rooms import RoomAdd, RoomPatch, RoomAddRequest, RoomPatchRequest
 
@@ -34,7 +35,7 @@ async def get_room(hotel_id: int, room_id: int, db: DBDep):
     try:
         room = await db.rooms.get_one_with_rels(id=room_id, hotel_id=hotel_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Номер не найден!")
+        raise RoomNotFoundHTTPException
 
     return room
 
@@ -44,7 +45,7 @@ async def delete_rooms(hotel_id: int, room_id: int, db: DBDep):
     try:
         await db.rooms.get_one(hotel_id=hotel_id, id=room_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Номер не найден!")
+        raise RoomNotFoundHTTPException
 
     await db.rooms.delete(id=room_id, hotel_id=hotel_id)
     await db.commit()
@@ -86,7 +87,7 @@ async def create_room(
     try:
         await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Отель не найден!")
+        raise HotelNotFoundHTTPException
 
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
     room = await db.rooms.add(_room_data)
@@ -105,7 +106,7 @@ async def patch_room(hotel_id: int, room_id: int, room_data: RoomPatchRequest, d
     try:
         await db.rooms.get_one(hotel_id=hotel_id, id=room_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Номер не найден!")
+        raise RoomNotFoundHTTPException
 
     room_data_dumped = room_data.model_dump(exclude_unset=True)
     room_data_ = RoomPatch(**room_data_dumped)
@@ -126,7 +127,7 @@ async def put_room(hotel_id: int, room_id: int, room_data: RoomAddRequest, db: D
     try:
         await db.rooms.get_one(hotel_id=hotel_id, id=room_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Номер не найден!")
+        raise RoomNotFoundHTTPException
 
     room_data_dumped = room_data.model_dump()
     room_data_ = RoomPatch(**room_data_dumped)

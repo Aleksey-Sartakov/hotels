@@ -7,7 +7,7 @@ from fastapi_cache.decorator import cache
 from starlette import status
 
 from src.api.dependencies import PaginationDep, DBDep
-from src.exceptions import DateToIsLessOrEqualThenDateFromException, ObjectNotFoundException
+from src.exceptions import DateToIsLessOrEqualThenDateFromException, ObjectNotFoundException, HotelNotFoundHTTPException
 from src.schemas.hotels import HotelPatch, HotelAdd
 
 
@@ -48,7 +48,7 @@ async def get_hotel(hotel_id: int, db: DBDep):
     try:
         hotel = await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Отель не найден")
+        raise HotelNotFoundHTTPException
 
     return hotel
 

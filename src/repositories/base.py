@@ -1,9 +1,10 @@
+from asyncpg import UniqueViolationError
 from pydantic import BaseModel
 from sqlalchemy import select, update, delete, insert
 from sqlalchemy.exc import NoResultFound, IntegrityError
 
 from src.database import Base
-from src.exceptions import ObjectNotFoundException, DBRestrictionsViolatedException
+from src.exceptions import ObjectNotFoundException, SameObjectAlreadyExistsException
 from src.repositories.mappers.base import DataMapper
 
 
@@ -46,8 +47,11 @@ class BaseRepository:
         entity = self.model(**data.model_dump())
         try:
             self.session.add(entity)
-        except IntegrityError:
-            raise DBRestrictionsViolatedException()
+        except IntegrityError as exc:
+            if isinstance(exc.orig.__cause__, UniqueViolationError):
+                raise SameObjectAlreadyExistsException() from exc
+            else:
+                raise exc
 
         await self.session.flush()
 
