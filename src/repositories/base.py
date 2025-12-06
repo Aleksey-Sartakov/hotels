@@ -1,3 +1,5 @@
+import logging
+
 from asyncpg import UniqueViolationError
 from pydantic import BaseModel
 from sqlalchemy import select, update, delete, insert
@@ -45,15 +47,16 @@ class BaseRepository:
 
     async def add(self, data: BaseModel):
         entity = self.model(**data.model_dump())
+        self.session.add(entity)
         try:
-            self.session.add(entity)
+            await self.session.flush()
         except IntegrityError as exc:
+            logging.exception(f"Не удалось добавить данные в БД")
             if isinstance(exc.orig.__cause__, UniqueViolationError):
                 raise SameObjectAlreadyExistsException() from exc
             else:
+                logging.error("Незнакомая ошибка!")
                 raise exc
-
-        await self.session.flush()
 
         return self.mapper.map_to_domain_entity(entity)
 

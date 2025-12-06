@@ -16,6 +16,7 @@ async def register_user(user_data: UserRequestAdd, db: DBDep):
 
     try:
         await db.users.add(new_user_data)
+        print("---------------------------------")
         await db.commit()
     except SameObjectAlreadyExistsException:
         raise HTTPException(

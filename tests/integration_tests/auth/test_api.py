@@ -5,7 +5,7 @@ import pytest
     "email, password, reg_status_code, login_status_code, wrong_login_status_code, me_status_code",
     [
         ("simple@mail.com", "1234", 200, 200, 401, 200),
-        ("simple@mail.com", "1234", 401, 200, 401, 200),
+        ("simple@mail.com", "1234", 409, 200, 401, 200),
         ("numeric1234@mail.com", "1234", 200, 200, 401, 200),
         ("special*!_'@mail.com", "1234", 200, 200, 401, 200),
         ("hard_pass@mail.com", "Qwer$y!_zxC", 200, 200, 401, 200),
