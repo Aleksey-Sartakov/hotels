@@ -4,7 +4,7 @@ from fastapi_cache.decorator import cache
 
 from src.api.dependencies import DBDep, RedisDep
 from src.schemas.facilities import FacilityAdd
-
+from src.services.facilities import FacilityService
 
 facilities_router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
@@ -12,15 +12,16 @@ facilities_router = APIRouter(prefix="/facilities", tags=["Удобства"])
 @facilities_router.get("")
 @cache(expire=10)
 async def get_facilities(db: DBDep, redis: RedisDep):
-    facilities = await db.facilities.get_all()
+    facility_service = FacilityService(db)
+    facilities = await facility_service.get_facilities()
 
     return facilities
 
 
 @facilities_router.delete("")
 async def delete_facilities(facility_id: int, db: DBDep):
-    await db.facilities.delete(id=facility_id)
-    await db.commit()
+    facility_service = FacilityService(db)
+    await facility_service.delete_facility(facility_id)
 
     return {"status": "No content"}
 
@@ -36,7 +37,7 @@ async def create_facilities(
         }
     ),
 ):
-    facility = await db.facilities.add(facility_add)
-    await db.commit()
+    facility_service = FacilityService(db)
+    facility = await facility_service.create_facility(facility_add)
 
     return {"status": "Created", "data": facility}

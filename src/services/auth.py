@@ -6,9 +6,10 @@ from fastapi import HTTPException, status
 from passlib.context import CryptContext
 
 from src.config import settings
+from src.services.base import BaseService
 
 
-class AuthService:
+class AuthService(BaseService):
     context = CryptContext(schemes=["argon2"], deprecated="auto")
     algorithm = "HS256"
     access_token_expire_minutes = 30

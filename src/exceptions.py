@@ -13,6 +13,14 @@ class ObjectNotFoundException(MainException):
     details = "Объект не найден!"
 
 
+class HotelNotFoundException(ObjectNotFoundException):
+    details = "Отель не найден!"
+
+
+class RoomNotFoundException(ObjectNotFoundException):
+    details = "Номер не найден!"
+
+
 class AllRoomsAreBookedException(MainException):
     details = "Не осталось свободных номеров!"
 
@@ -21,7 +29,7 @@ class SameObjectAlreadyExistsException(MainException):
     details = "Нарушены ограничения БД при добавлении новых данных."
 
 
-class DateToIsLessOrEqualThenDateFromException(MainException):
+class DateToLessOrEqualThenDateFromException(MainException):
     details = "Дата конца меньше или равна дате начала."
 
 
