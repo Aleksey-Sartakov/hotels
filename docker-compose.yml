@@ -1,0 +1,35 @@
+services:
+  hotels_back_service:
+    container_name: "hotels_back"
+    build:
+      context: .
+    ports:
+      - "9898:8000"
+    networks:
+      - hotels-network
+    env_file:
+      - .env
+
+  hotels_celery_worker_service:
+    container_name: "hotels_celery_worker"
+    build:
+      context: .
+    networks:
+      - hotels-network
+    env_file:
+      - .env
+    command: "celery --app=src.tasks.celery_app:celery_instance worker -l INFO"
+
+  hotels_celery_beat_service:
+    container_name: "hotels_celery_beat"
+    build:
+      context: .
+    networks:
+      - hotels-network
+    env_file:
+      - .env
+    command: "celery --app=src.tasks.celery_app:celery_instance beat -l INFO"
+
+networks:
+  hotels-network:
+    external: true
