@@ -1,4 +1,4 @@
-from src.schemas.base import BaseSchema
+from src.schemas.base import BaseSchema, NonEmptyPayloadSchema
 from src.schemas.facilities import Facility
 
 
@@ -26,7 +26,7 @@ class RoomWithRels(Room):
     facilities: list[Facility]
 
 
-class RoomPatch(BaseSchema):
+class RoomPatch(NonEmptyPayloadSchema):
     title: str | None = None
     description: str | None = None
     price: int | None = None

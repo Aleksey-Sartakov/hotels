@@ -3,7 +3,8 @@ from datetime import date
 from fastapi import HTTPException
 from sqlalchemy import select
 
-from src.exceptions import AllRoomsAreBookedException
+from src.exceptions import AllRoomsAreBookedException, DateCannotBeInPastException, \
+    DateToLessOrEqualThenDateFromException
 from src.models.bookings import Bookings
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import BookingDataMapper
@@ -22,6 +23,12 @@ class BookingsRepository(BaseRepository):
         return [self.mapper.map_to_domain_entity(booking) for booking in res.scalars()]
 
     async def add_booking(self, data: BookingAdd):
+        today = date.today()
+        if data.date_from < today or data.date_to < today:
+            raise DateCannotBeInPastException
+        if data.date_from >= data.date_to:
+            raise DateToLessOrEqualThenDateFromException
+
         available_rooms_ids_query = get_available_rooms_ids_query(data.date_from, data.date_to)
         available_rooms_ids = await self.session.execute(available_rooms_ids_query)
         if data.room_id not in available_rooms_ids.scalars():

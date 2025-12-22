@@ -1,4 +1,4 @@
-from src.schemas.base import BaseSchema
+from src.schemas.base import BaseSchema, NonEmptyPayloadSchema
 
 
 class HotelAdd(BaseSchema):
@@ -10,6 +10,6 @@ class Hotel(HotelAdd):
     id: int
 
 
-class HotelPatch(BaseSchema):
+class HotelPatch(NonEmptyPayloadSchema):
     location: str | None = None
     title: str | None = None

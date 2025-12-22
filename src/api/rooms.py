@@ -7,8 +7,8 @@ from fastapi_cache.decorator import cache
 from src.api.dependencies import DBDep
 from src.exceptions import (
     DateToLessOrEqualThenDateFromException, ObjectNotFoundException,
-                            HotelNotFoundHTTPException, RoomNotFoundHTTPException, HotelNotFoundException,
-                            RoomNotFoundException
+    HotelNotFoundHTTPException, RoomNotFoundHTTPException, HotelNotFoundException,
+    RoomNotFoundException, FacilitiesNotFoundException, FacilitiesNotFoundHTTPException
 )
 from src.schemas.rooms import RoomAddRequest, RoomPatchRequest
 from src.services.rooms import RoomService
@@ -66,7 +66,6 @@ async def create_room(
             "1": Example(
                 summary="Люкс, отель 1",
                 value={
-                    "hotel_id": 1,
                     "title": "Люкс",
                     "description": "Супер пупер номер",
                     "price": 12000,
@@ -77,7 +76,6 @@ async def create_room(
             "2": Example(
                 summary="Средний, отель 1",
                 value={
-                    "hotel_id": 1,
                     "title": "Средний",
                     "description": "Ничего необычного",
                     "price": 6000,
@@ -93,6 +91,8 @@ async def create_room(
         room = await room_service.create_room(hotel_id, room_data)
     except HotelNotFoundException:
         raise HotelNotFoundHTTPException
+    except FacilitiesNotFoundException as exc:
+        raise FacilitiesNotFoundHTTPException(ids=exc.ids)
 
     return {"status": "Created", "data": room}
 

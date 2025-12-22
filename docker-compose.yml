@@ -3,8 +3,8 @@ services:
     container_name: "hotels_back"
     build:
       context: .
-    ports:
-      - "9898:8000"
+#    ports:
+#      - "9898:8000"
     networks:
       - hotels-network
     env_file:

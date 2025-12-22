@@ -1,9 +1,11 @@
 from datetime import date
 
-from src.exceptions import ObjectNotFoundException, HotelNotFoundException, RoomNotFoundException
+from src.exceptions import ObjectNotFoundException, HotelNotFoundException, RoomNotFoundException, \
+    FacilitiesNotFoundException
 from src.schemas.facilities import RoomToFacilityAdd
 from src.schemas.rooms import RoomAddRequest, RoomAdd, RoomPatchRequest, RoomPatch, Room
 from src.services.base import BaseService
+from src.services.facilities import FacilityService
 from src.services.hotels import HotelService
 
 
@@ -41,10 +43,20 @@ class RoomService(BaseService):
         room = await self.db.rooms.add(_room_data)
 
         if room_data.facilities_ids:
+            facility_service = FacilityService(self.db)
+            existing_facilities = await facility_service.get_facilities()
+            existing_facilities_id = [facility.id for facility in existing_facilities]
+
+            not_found_facilities_id = set(room_data.facilities_ids) - set(existing_facilities_id)
+            if not_found_facilities_id:
+                raise FacilitiesNotFoundException(ids=list(not_found_facilities_id))
+
             facilities = [RoomToFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
             await self.db.rooms_to_facilities.add_bulk(facilities)
 
         await self.db.commit()
+
+        return room
 
     async def patch_room(self, hotel_id: int, room_id: int, room_data: RoomPatchRequest):
         hotel_service = HotelService(self.db)

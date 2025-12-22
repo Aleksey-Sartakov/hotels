@@ -1,6 +1,6 @@
 from datetime import date
 
-from src.schemas.base import BaseSchema
+from src.schemas.base import BaseSchema, NonEmptyPayloadSchema
 
 
 class BookingAddRequest(BaseSchema):
@@ -19,7 +19,7 @@ class Booking(BookingAdd):
     total_cost: int
 
 
-class BookingUpdate(BaseSchema):
+class BookingUpdate(NonEmptyPayloadSchema):
     date_from: date | None = None
     date_to: date | None = None
     room_id: int | None = None

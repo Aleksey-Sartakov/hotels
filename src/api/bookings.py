@@ -2,7 +2,9 @@ from fastapi import APIRouter, Body, HTTPException, status
 from fastapi.openapi.models import Example
 
 from src.api.dependencies import DBDep, UserIdDep
-from src.exceptions import ObjectNotFoundException, AllRoomsAreBookedException, RoomNotFoundHTTPException
+from src.exceptions import ObjectNotFoundException, AllRoomsAreBookedException, RoomNotFoundHTTPException, \
+    DateToLessOrEqualThenDateFromException, BookingDateToLessOrEqualThenDateFromHTTPException, \
+    DateCannotBeInPastException, DateCannotBeInPastHTTPException
 from src.schemas.bookings import BookingAddRequest, BookingAdd
 
 
@@ -42,11 +44,7 @@ async def create_booking(
             ),
             "2": Example(
                 summary="Бронирование 2", value={"date_from": "2026-01-01", "date_to": "2026-01-03", "room_id": 3}
-            ),
-            "3": Example(
-                summary="Бронирование запрещенное",
-                value={"date_from": "2026-01-01", "date_to": "2026-01-03", "room_id": 1},
-            ),
+            )
         }
     ),
 ):
@@ -58,8 +56,15 @@ async def create_booking(
     _booking_data = BookingAdd(user_id=user_id, price=room.price, **booking_data.model_dump(exclude_unset=True))
     try:
         booking = await db.bookings.add_booking(_booking_data)
+
     except AllRoomsAreBookedException:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Не осталось свободных номеров.")
+
+    except DateToLessOrEqualThenDateFromException:
+        raise BookingDateToLessOrEqualThenDateFromHTTPException
+
+    except DateCannotBeInPastException:
+        raise DateCannotBeInPastHTTPException
 
     await db.commit()
 

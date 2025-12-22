@@ -26,7 +26,10 @@ class HotelService(BaseService):
         return hotels
 
     async def get_hotel(self, hotel_id: int):
-        hotel = await self.db.hotels.get_one(id=hotel_id)
+        try:
+            hotel = await self.db.hotels.get_one(id=hotel_id)
+        except ObjectNotFoundException:
+            raise HotelNotFoundException
 
         return hotel
 
@@ -51,5 +54,6 @@ class HotelService(BaseService):
         await self.db.commit()
 
     async def delete_hotel(self, hotel_id: int):
+        await self.get_hotel_or_raise(hotel_id)
         await self.db.hotels.delete(id=hotel_id)
         await self.db.commit()

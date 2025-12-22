@@ -1,13 +1,13 @@
 from datetime import date
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body
 from fastapi.openapi.models import Example
 from fastapi.params import Query
 from fastapi_cache.decorator import cache
-from starlette import status
 
 from src.api.dependencies import PaginationDep, DBDep
-from src.exceptions import DateToLessOrEqualThenDateFromException, ObjectNotFoundException, HotelNotFoundHTTPException
+from src.exceptions import DateToLessOrEqualThenDateFromException, HotelNotFoundHTTPException, HotelNotFoundException, \
+    DateCannotBeInPastException, DateCannotBeInPastHTTPException, BookingDateToLessOrEqualThenDateFromHTTPException
 from src.schemas.hotels import HotelPatch, HotelAdd
 from src.services.hotels import HotelService
 
@@ -19,8 +19,8 @@ hotels_router = APIRouter(prefix="/hotels", tags=["Отели"])
 async def get_hotels(
     pagination: PaginationDep,
     db: DBDep,
-    date_from: date = Query(examples=["2026-01-01"]),
-    date_to: date = Query(examples=["2026-01-20"]),
+    date_from: date = Query(example="2026-01-01"),
+    date_to: date = Query(example="2026-01-20"),
     location: str | None = Query(None, description="Расположение отеля"),
     title: str | None = Query(None, description="Название отеля"),
 ):
@@ -31,12 +31,11 @@ async def get_hotels(
             pagination=pagination, date_from=date_from, date_to=date_to, location=location, title=title
         )
     except DateToLessOrEqualThenDateFromException:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Дата выезда должна быть указаны позднее даты заезда"
-        )
+        raise BookingDateToLessOrEqualThenDateFromHTTPException
+    except DateCannotBeInPastException:
+        raise DateCannotBeInPastHTTPException
 
-    return {"status": "No content", "data": hotels}
+    return hotels
 
 
 @hotels_router.get("/{hotel_id}")
@@ -45,7 +44,7 @@ async def get_hotel(hotel_id: int, db: DBDep):
 
     try:
         hotel = await hotel_service.get_hotel(hotel_id)
-    except ObjectNotFoundException:
+    except HotelNotFoundException:
         raise HotelNotFoundHTTPException
 
     return hotel
@@ -54,7 +53,10 @@ async def get_hotel(hotel_id: int, db: DBDep):
 @hotels_router.delete("/{hotel_id}")
 async def delete_hotels(hotel_id: int, db: DBDep):
     hotel_service = HotelService(db)
-    await hotel_service.delete_hotel(hotel_id)
+    try:
+        await hotel_service.delete_hotel(hotel_id)
+    except HotelNotFoundException:
+        raise HotelNotFoundHTTPException
 
     return {"status": "No content"}
 

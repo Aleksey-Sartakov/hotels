@@ -1,8 +1,9 @@
+import datetime
 from datetime import date
 
 from sqlalchemy import select
 
-from src.exceptions import DateToLessOrEqualThenDateFromException
+from src.exceptions import DateToLessOrEqualThenDateFromException, DateCannotBeInPastException
 from src.models.hotels import Hotels
 from src.models.rooms import Rooms
 from src.repositories.base import BaseRepository
@@ -23,8 +24,11 @@ class HotelsRepository(BaseRepository):
         title: str | None = None,
         location: str | None = None,
     ):
+        today = datetime.date.today()
+        if date_from < today or date_to < today:
+            raise DateCannotBeInPastException
         if date_from >= date_to:
-            raise DateToLessOrEqualThenDateFromException()
+            raise DateToLessOrEqualThenDateFromException
 
         available_rooms_ids = get_available_rooms_ids_query(date_from, date_to)
         available_hotels_ids = select(Rooms.hotel_id).filter(Rooms.id.in_(available_rooms_ids))

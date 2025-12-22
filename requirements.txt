@@ -18,7 +18,7 @@ click-repl==0.3.0
 colorama==0.4.6
 dnspython==2.7.0
 email-validator==2.3.0
-fastapi==0.116.1
+fastapi==0.126.0
 fastapi-cache2==0.2.2
 fastapi-cli==0.0.10
 fastapi-cloud-cli==0.1.5
